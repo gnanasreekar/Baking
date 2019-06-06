@@ -21,6 +21,7 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.dash.DashChunkSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
@@ -72,6 +73,7 @@ public class stepsDetailFragment extends Fragment {
         componentListener = new ComponentListener();
         playerView =  rootView.findViewById(R.id.video_view);
         Toast.makeText(getActivity(), getArguments().getString("v2") , Toast.LENGTH_SHORT).show();
+        initializePlayer();
         return rootView;
     }
 
@@ -120,8 +122,8 @@ public class stepsDetailFragment extends Fragment {
             simpleExoPlayer.setPlayWhenReady(playwhenready);
             simpleExoPlayer.seekTo(currentwindow, playbackpos);
         }
-            MediaSource mediaSource = buildMediaSource(Uri.parse(video_url));
-            simpleExoPlayer.prepare(mediaSource, true, false);
+        MediaSource mediaSource = buildMediaSource(Uri.parse(video_url));
+        simpleExoPlayer.prepare(mediaSource, true, false);
     }
 
     private void releasePlayer() {
@@ -141,8 +143,7 @@ public class stepsDetailFragment extends Fragment {
         DataSource.Factory manifestDataSourceFactory = new DefaultHttpDataSourceFactory("url");
         DashChunkSource.Factory dashChunkSourceFactory = new DefaultDashChunkSource.Factory(
                 new DefaultHttpDataSourceFactory("url", BANDWIDTH_METER));
-        return new DashMediaSource.Factory(dashChunkSourceFactory, manifestDataSourceFactory)
-                .createMediaSource(uri);
+        return new ExtractorMediaSource.Factory(new DefaultHttpDataSourceFactory("baking_app")).createMediaSource(uri);
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)

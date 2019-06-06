@@ -1,59 +1,46 @@
 package com.rgs.bakingapp1.widget;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
-import android.util.Log;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.widget.RemoteViews;
-import android.widget.TextView;
-import android.widget.Toast;
 
+import com.rgs.bakingapp1.MainActivity;
 import com.rgs.bakingapp1.R;
 
 /**
  * Implementation of App Widget functionality.
  */
-public class IngWid extends AppWidgetProvider {
-    static String ings;
-    TextView ing_tv;
-
-    public String ing(String stringBuilder)
-    {
-        ings = stringBuilder;
-        Log.d("inges" , ings);
-        return stringBuilder;
-    }
+public class NewAppWidget extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
-            Toast.makeText(context, "updates", Toast.LENGTH_SHORT).show();
         }
     }
 
+    static SharedPreferences s;
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
-
-
-        Toast.makeText(context, ings, Toast.LENGTH_SHORT).show();
+        s = context.getSharedPreferences("myfile",Context.MODE_PRIVATE);
+        String data = s.getString("ALL","NO DATA AVAILABLE");
+        CharSequence widgetText = context.getString(R.string.appwidget_text);
         // Construct the RemoteViews object
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.ing_wid);
-        views.setTextViewText(R.id.appwidget_text, ings);
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
+        views.setTextViewText(R.id.appwidget_text, data);
+        Intent intent = new Intent(context, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context,0,intent,0);
+        views.setOnClickPendingIntent(R.id.baking_widget,pendingIntent);
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
-    @Override
-    public void onEnabled(Context context) {
-        // Enter relevant functionality for when the first widget is created
-    }
 
 
-    @Override
-    public void onDisabled(Context context) {
-        // Enter relevant functionality for when the last widget is disabled
-    }
 }
 

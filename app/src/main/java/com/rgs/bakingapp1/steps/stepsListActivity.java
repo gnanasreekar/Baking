@@ -1,28 +1,24 @@
 package com.rgs.bakingapp1.steps;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.rgs.bakingapp1.POJO;
 import com.rgs.bakingapp1.R;
-import com.rgs.bakingapp1.widget.IngWid;
-
+import com.rgs.bakingapp1.widget.NewAppWidget;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class stepsListActivity extends AppCompatActivity {
@@ -35,7 +31,7 @@ public class stepsListActivity extends AppCompatActivity {
     Intent intent;
     StringBuilder all;
     private static stepsDetailFragment stepsDetailFragment;
-
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +40,7 @@ public class stepsListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_steps_list);
         ingeridents = findViewById(R.id.ingeridents);
-
+        sharedPreferences = getSharedPreferences("myfile",MODE_PRIVATE);
         //TODO check stuff
         //Ingeridents
         all = new StringBuilder();
@@ -60,9 +56,18 @@ public class stepsListActivity extends AppCompatActivity {
             }
         }
         String inger = all.toString();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("ALL",inger);
+        editor.apply();
         ingeridents.setText(inger);
-        new IngWid().ing(inger);
-        //Toast.makeText(this, inger, Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(this, NewAppWidget.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        int[] ids = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(
+                new ComponentName(getApplication(), NewAppWidget.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        sendBroadcast(intent);
+
 
 
         if (findViewById(R.id.steps_detail_container) != null) {
@@ -105,9 +110,9 @@ public class stepsListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-                    POJO.StepsBean stepsBean = stepsBeans.get(position);
-                    String step = stepsBean.getShortDescription();
-                    holder.pos(step);
+            POJO.StepsBean stepsBean = stepsBeans.get(position);
+            String step = stepsBean.getShortDescription();
+            holder.pos(step);
 
 
 
@@ -130,7 +135,7 @@ public class stepsListActivity extends AppCompatActivity {
                     public void onClick(View view)
                     {
                         int pos=getAdapterPosition();
-                       stepsDetailFragment = new stepsDetailFragment();
+                        stepsDetailFragment = new stepsDetailFragment();
                         Bundle bundle = new Bundle();
                         bundle.putString("v1" , stepsBeans.get(pos).getDescription());
                         bundle.putString("v2" , stepsBeans.get(pos).getVideoURL() );

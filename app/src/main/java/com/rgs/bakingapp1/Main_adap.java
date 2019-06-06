@@ -2,8 +2,10 @@ package com.rgs.bakingapp1;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -74,6 +76,7 @@ public class Main_adap extends RecyclerView.Adapter<Main_adap.ViewHolder> {
             items.setText(name);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onClick(View view) {
             int pos=getAdapterPosition();
@@ -82,6 +85,7 @@ public class Main_adap extends RecyclerView.Adapter<Main_adap.ViewHolder> {
             intent.putExtra("position" , pos);
             intent.putParcelableArrayListExtra("stepsList", (ArrayList<? extends Parcelable>) list.get(pos).getSteps());
             intent.putParcelableArrayListExtra("ingredientsList", (ArrayList<? extends Parcelable>) list.get(pos).getIngredients());
+
             context.startActivity(intent);
 
         }

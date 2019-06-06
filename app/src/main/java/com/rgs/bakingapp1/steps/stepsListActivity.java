@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.rgs.bakingapp1.POJO;
 import com.rgs.bakingapp1.R;
+import com.rgs.bakingapp1.widget.IngWid;
 
 
 import java.util.ArrayList;
@@ -26,12 +27,13 @@ import java.util.List;
 
 public class stepsListActivity extends AppCompatActivity {
 
-
+    TextView ingeridents;
     private boolean mTwoPane;
-    private POJO pojos;
     private ArrayList<POJO.StepsBean> stepsBeans;
     ArrayList<POJO.IngredientsBean> ingredientsBeans;
+    ArrayList<POJO> pojos;
     Intent intent;
+    StringBuilder all;
     private static stepsDetailFragment stepsDetailFragment;
 
 
@@ -41,10 +43,26 @@ public class stepsListActivity extends AppCompatActivity {
         ingredientsBeans = getIntent().getParcelableArrayListExtra("ingredientsList");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_steps_list);
+        ingeridents = findViewById(R.id.ingeridents);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setTitle(getTitle());
+        //TODO check stuff
+        //Ingeridents
+        all = new StringBuilder();
+        for (int i=0; i<ingredientsBeans.size(); i++) {
+            String quantity = ingredientsBeans.get(i).getQuantity();
+            String measure = ingredientsBeans.get(i).getMeasure();
+            String ingredient = ingredientsBeans.get(i).getIngredient();
+
+            if (i < (ingredientsBeans.size()-1)) {
+                all.append(quantity).append(" ").append(measure).append("   ").append(ingredient).append("\n");
+            } else {
+                all.append(quantity).append(" ").append(measure).append("   ").append(ingredient);
+            }
+        }
+        String inger = all.toString();
+        ingeridents.setText(inger);
+        new IngWid().ing(inger);
+        //Toast.makeText(this, inger, Toast.LENGTH_SHORT).show();
 
 
         if (findViewById(R.id.steps_detail_container) != null) {
@@ -129,6 +147,7 @@ public class stepsListActivity extends AppCompatActivity {
 
                             context.startActivity(intent);
                         }
+
                     }
                 });
             }

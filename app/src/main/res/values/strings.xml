@@ -10,4 +10,6 @@
     <string name="title_steps_detail">steps Detail</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="Baking_app">Baking App</string>
+    <string name="ingeridents">Ingeridents</string>
 </resources>

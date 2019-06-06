@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,7 +20,6 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -59,10 +59,7 @@ public class MainActivity extends AppCompatActivity {
         main_adap = new Main_adap(MainActivity.this);
         getdata();
         pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
-        file_save = pref.getBoolean("saved" , false);
-
-
-
+        file_save = pref.getBoolean("saved", false);
     }
 
 
@@ -77,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONArray response) {
                 if(!file_save){
+                    Toast.makeText(MainActivity.this, "online data", Toast.LENGTH_SHORT).show();
                     json(response);
                 }
                 savefile(response);
@@ -136,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         }
         pref.edit().putBoolean("saved" , true).apply();
 
-        Toast.makeText(this, "saved to" + getFilesDir() + "/" + FILE_NAME, Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(this, "saved to" + getFilesDir() + "/" + FILE_NAME, Toast.LENGTH_SHORT).show();
         return true;
 
     }
@@ -167,29 +165,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-//    public void parse(String data)
-//    {
-//        JSONArray jsonArr = null;
-//        try {
-//            jsonArr = new JSONArray(data);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        for (int i = 0; i < jsonArr.length(); i++)
-//            {
-//                JSONObject jsonObj = null;
-//                try {
-//                    jsonObj = jsonArr.getJSONObject(i);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//                json(jsonObj);
-//            }
-//    }
-
-
-
 
 
     public Activity getActivity() {

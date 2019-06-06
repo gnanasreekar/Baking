@@ -12,14 +12,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <receiver android:name=".Baking_app_widget">
+        <receiver android:name=".widget.IngWid">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/baking_app_widget_info" />
+                android:resource="@xml/ing_wid_info" />
         </receiver>
 
         <activity
@@ -35,20 +35,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.rgs.bakingapp1.steps.stepsListActivity" />
         </activity>
-        <activity
-            android:name=".masterdetailflow.DisplaydataListActivity"
-            android:label="@string/title_displaydata_list"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".masterdetailflow.DisplaydataDetailActivity"
-            android:label="@string/title_displaydata_detail"
-            android:parentActivityName=".masterdetailflow.DisplaydataListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.rgs.bakingapp1.masterdetailflow.DisplaydataListActivity" />
-        </activity>
-
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />

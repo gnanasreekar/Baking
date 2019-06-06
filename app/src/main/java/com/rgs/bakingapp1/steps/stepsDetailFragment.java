@@ -1,43 +1,55 @@
 package com.rgs.bakingapp1.steps;
 
-import android.app.Activity;
+import android.annotation.TargetApi;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Format;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.audio.AudioRendererEventListener;
+import com.google.android.exoplayer2.decoder.DecoderCounters;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.dash.DashChunkSource;
+import com.google.android.exoplayer2.source.dash.DashMediaSource;
+import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
+import com.google.android.exoplayer2.video.VideoRendererEventListener;
 import com.rgs.bakingapp1.R;
 
-
-/**
- * A fragment representing a single steps detail screen.
- * This fragment is either contained in a {@link stepsListActivity}
- * in two-pane mode (on tablets) or a {@link stepsDetailActivity}
- * on handsets.
- */
 public class stepsDetailFragment extends Fragment {
-    /**
-     * The fragment argument representing the item ID that this fragment
-     * represents.
-     */
-    public static final String ARG_ITEM_ID = "item_id";
 
-    /**
-     * The dummy content this fragment is presenting.
-     */
 
-    Bundle bundle;
+    private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
+    private SimpleExoPlayer simpleExoPlayer;
+    private PlayerView playerView;
+    private long playbackpos;
+    private int currentwindow;
+    private boolean playwhenready = true;
+    private ComponentListener componentListener;
     private String step_desc;
     private String video_url;
     TextView discription;
-    TextView vidurl;
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
+
     public stepsDetailFragment() {
     }
 
@@ -46,13 +58,8 @@ public class stepsDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments().containsKey("v1")) {
-            // Load the dummy content specified by the fragment
-            // arguments. In a real-world scenario, use a Loader
-            // to load content from a content provider.
             step_desc= getArguments().getString("v1");
             video_url = getArguments().getString("v2");
-            Activity activity = this.getActivity();
-
         }
     }
 
@@ -62,10 +69,187 @@ public class stepsDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.steps_detail, container, false);
         discription = rootView.findViewById(R.id.step_ins);
         discription.setText(step_desc);
-
-
+        componentListener = new ComponentListener();
+        playerView =  rootView.findViewById(R.id.video_view);
         Toast.makeText(getActivity(), getArguments().getString("v2") , Toast.LENGTH_SHORT).show();
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (Util.SDK_INT > 23) {
+            initializePlayer();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    @Override
+    public void onResume() {
+        super.onResume();
+        hideSystemUi();
+        if ((Util.SDK_INT <= 23 || simpleExoPlayer == null)) {
+            initializePlayer();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (Util.SDK_INT <= 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Util.SDK_INT > 23) {
+            releasePlayer();
+        }
+    }
+
+    private void initializePlayer() {
+        if (simpleExoPlayer == null) {
+            TrackSelection.Factory adaptiveTrackSelectionFactory = new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
+            simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(getActivity()), new DefaultTrackSelector(adaptiveTrackSelectionFactory), new DefaultLoadControl());
+            simpleExoPlayer.addListener(componentListener);
+            simpleExoPlayer.addVideoDebugListener(componentListener);
+            simpleExoPlayer.addAudioDebugListener(componentListener);
+            playerView.setPlayer(simpleExoPlayer);
+            simpleExoPlayer.setPlayWhenReady(playwhenready);
+            simpleExoPlayer.seekTo(currentwindow, playbackpos);
+        }
+            MediaSource mediaSource = buildMediaSource(Uri.parse(video_url));
+            simpleExoPlayer.prepare(mediaSource, true, false);
+    }
+
+    private void releasePlayer() {
+        if (simpleExoPlayer != null) {
+            playbackpos = simpleExoPlayer.getCurrentPosition();
+            currentwindow = simpleExoPlayer.getCurrentWindowIndex();
+            playwhenready = simpleExoPlayer.getPlayWhenReady();
+            simpleExoPlayer.removeListener(componentListener);
+            simpleExoPlayer.removeVideoDebugListener(componentListener);
+            simpleExoPlayer.removeAudioDebugListener(componentListener);
+            simpleExoPlayer.release();
+            simpleExoPlayer = null;
+        }
+    }
+
+    private MediaSource buildMediaSource(Uri uri) {
+        DataSource.Factory manifestDataSourceFactory = new DefaultHttpDataSourceFactory("url");
+        DashChunkSource.Factory dashChunkSourceFactory = new DefaultDashChunkSource.Factory(
+                new DefaultHttpDataSourceFactory("url", BANDWIDTH_METER));
+        return new DashMediaSource.Factory(dashChunkSourceFactory, manifestDataSourceFactory)
+                .createMediaSource(uri);
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    private void hideSystemUi() {
+        playerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    }
+
+    private class ComponentListener extends Player.DefaultEventListener implements
+            VideoRendererEventListener, AudioRendererEventListener {
+
+        @Override
+        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+            String state;
+            switch (playbackState) {
+                case Player.STATE_IDLE:
+                    state = "ExoPlayer.STATE_IDLE      -";
+                    break;
+                case Player.STATE_BUFFERING:
+                    state = "ExoPlayer.STATE_BUFFERING -";
+                    break;
+                case Player.STATE_READY:
+                    state = "ExoPlayer.STATE_READY     -";
+                    break;
+                case Player.STATE_ENDED:
+                    state = "ExoPlayer.STATE_ENDED     -";
+                    break;
+                default:
+                    state = "UNKNOWN_STATE             -";
+                    break;
+            }
+        }
+
+        // Implementing VideoRendererEventListener.
+
+        @Override
+        public void onVideoEnabled(DecoderCounters counters) {
+            // Do nothing.
+        }
+
+        @Override
+        public void onVideoDecoderInitialized(String decoderName, long initializedTimestampMs, long initializationDurationMs) {
+            // Do nothing.
+        }
+
+        @Override
+        public void onVideoInputFormatChanged(Format format) {
+            // Do nothing.
+        }
+
+        @Override
+        public void onDroppedFrames(int count, long elapsedMs) {
+            // Do nothing.
+        }
+
+        @Override
+        public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+            // Do nothing.
+        }
+
+        @Override
+        public void onRenderedFirstFrame(Surface surface) {
+            // Do nothing.
+        }
+
+        @Override
+        public void onVideoDisabled(DecoderCounters counters) {
+            // Do nothing.
+        }
+
+        // Implementing AudioRendererEventListener.
+
+        @Override
+        public void onAudioEnabled(DecoderCounters counters) {
+            // Do nothing.
+        }
+
+        @Override
+        public void onAudioSessionId(int audioSessionId) {
+            // Do nothing.
+        }
+
+        @Override
+        public void onAudioDecoderInitialized(String decoderName, long initializedTimestampMs, long initializationDurationMs) {
+            // Do nothing.
+        }
+
+        @Override
+        public void onAudioInputFormatChanged(Format format) {
+            // Do nothing.
+        }
+
+        @Override
+        public void onAudioSinkUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
+            // Do nothing.
+        }
+
+        @Override
+        public void onAudioDisabled(DecoderCounters counters) {
+            // Do nothing.
+        }
+
     }
 
 

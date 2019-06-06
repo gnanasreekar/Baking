@@ -10,14 +10,14 @@
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
     android:showDividers="middle"
-    tools:context=".steps.stepsListActivity">
+    tools:context=".steps.stepsListActivity"
+    android:background="@color/colorPrimaryDark">
 
     <!--
     This layout is a two-pane layout for the Items
     master/detail flow.
     
     -->
-
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/steps_list"
@@ -26,6 +26,7 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
+        android:background="@color/colorPrimaryDark"
         app:layoutManager="LinearLayoutManager"
         tools:context="com.rgs.bakingapp1.steps.stepsListActivity"
         tools:listitem="@layout/steps_list_content" />
@@ -33,6 +34,7 @@
     <FrameLayout
         android:id="@+id/steps_detail_container"
         android:layout_width="0dp"
+        android:background="@color/colorPrimaryDark"
         android:layout_height="match_parent"
         android:layout_weight="3" />
 

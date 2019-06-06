@@ -13,12 +13,6 @@ import android.view.MenuItem;
 
 import com.rgs.bakingapp1.R;
 
-/**
- * An activity representing a single steps detail screen. This
- * activity is only used on narrow width devices. On tablet-size devices,
- * item details are presented side-by-side with a list of items
- * in a {@link stepsListActivity}.
- */
 public class stepsDetailActivity extends AppCompatActivity {
 
     @Override

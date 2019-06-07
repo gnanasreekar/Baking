@@ -16,6 +16,8 @@
         android:id="@+id/video_view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/exo_height"
+        app:fastforward_increment="1000"
+        app:rewind_increment="1000"
         android:padding="5dp"/>
 
     <TextView

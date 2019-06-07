@@ -1,5 +1,6 @@
 package com.rgs.bakingapp1.steps;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -137,7 +138,7 @@ public class stepsDetailFragment extends Fragment {
         return new ExtractorMediaSource.Factory(new DefaultHttpDataSourceFactory("baking_app")).createMediaSource(uri);
     }
 
-
+    @SuppressLint("InlinedApi")
     private void hideSystemUi() {
         playerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                 | View.SYSTEM_UI_FLAG_FULLSCREEN

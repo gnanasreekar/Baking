@@ -9,7 +9,6 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -65,7 +64,6 @@ public class stepsDetailFragment extends Fragment {
         discription.setText(step_desc);
         componentListener = new ComponentListener();
         playerView =  rootView.findViewById(R.id.video_view);
-        Toast.makeText(getActivity(), getArguments().getString("v2") , Toast.LENGTH_SHORT).show();
         initializePlayer();
         return rootView;
     }

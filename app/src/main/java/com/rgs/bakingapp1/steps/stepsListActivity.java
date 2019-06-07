@@ -41,7 +41,6 @@ public class stepsListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_steps_list);
         ingeridents = findViewById(R.id.ingeridents);
         sharedPreferences = getSharedPreferences("myfile",MODE_PRIVATE);
-        //TODO check stuff
         //Ingeridents
         all = new StringBuilder();
         for (int i=0; i<ingredientsBeans.size(); i++) {

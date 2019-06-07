@@ -1,10 +1,7 @@
 package com.rgs.bakingapp1.steps;
 
-import android.annotation.TargetApi;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -23,14 +20,10 @@ import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.dash.DashChunkSource;
-import com.google.android.exoplayer2.source.dash.DashMediaSource;
-import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
@@ -65,8 +58,7 @@ public class stepsDetailFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.steps_detail, container, false);
         discription = rootView.findViewById(R.id.step_ins);
         discription.setText(step_desc);
@@ -85,7 +77,6 @@ public class stepsDetailFragment extends Fragment {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onResume() {
         super.onResume();
@@ -140,14 +131,13 @@ public class stepsDetailFragment extends Fragment {
     }
 
     private MediaSource buildMediaSource(Uri uri) {
-        DataSource.Factory manifestDataSourceFactory = new DefaultHttpDataSourceFactory("url");
-        DashChunkSource.Factory dashChunkSourceFactory = new DefaultDashChunkSource.Factory(
-                new DefaultHttpDataSourceFactory("url", BANDWIDTH_METER));
+//        DataSource.Factory manifestDataSourceFactory = new DefaultHttpDataSourceFactory("url");
+//        DashChunkSource.Factory dashChunkSourceFactory = new DefaultDashChunkSource.Factory(
+//                new DefaultHttpDataSourceFactory("url", BANDWIDTH_METER));
         return new ExtractorMediaSource.Factory(new DefaultHttpDataSourceFactory("baking_app")).createMediaSource(uri);
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+
     private void hideSystemUi() {
         playerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -160,29 +150,6 @@ public class stepsDetailFragment extends Fragment {
     private class ComponentListener extends Player.DefaultEventListener implements
             VideoRendererEventListener, AudioRendererEventListener {
 
-        @Override
-        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            String state;
-            switch (playbackState) {
-                case Player.STATE_IDLE:
-                    state = "ExoPlayer.STATE_IDLE      -";
-                    break;
-                case Player.STATE_BUFFERING:
-                    state = "ExoPlayer.STATE_BUFFERING -";
-                    break;
-                case Player.STATE_READY:
-                    state = "ExoPlayer.STATE_READY     -";
-                    break;
-                case Player.STATE_ENDED:
-                    state = "ExoPlayer.STATE_ENDED     -";
-                    break;
-                default:
-                    state = "UNKNOWN_STATE             -";
-                    break;
-            }
-        }
-
-        // Implementing VideoRendererEventListener.
 
         @Override
         public void onVideoEnabled(DecoderCounters counters) {
